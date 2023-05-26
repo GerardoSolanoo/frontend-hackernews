@@ -1,16 +1,44 @@
 import React, { useState } from 'react';
+import { useMutation, gql } from '@apollo/client';
+import { useNavigate } from 'react-router-dom';
 
-const CreateLink = () => {
-  const [formState, setFormState] = useState({
-    description: '',
-    url: ''
+const CREATE_LINK_MUTATION = gql`
+  mutation PostMutation(
+    $description: String!
+    $url: String!
+  ) {
+    post(description: $description, url: $url) {
+      id
+      createdAt
+      url
+      description
+    }
+  }
+`;
+
+  const CreateLink = () => {
+    const navigate = useNavigate();
+    const [formState, setFormState] = useState({
+        description: '',
+        url: ''
+    });
+    
+    const [createLink] = useMutation(CREATE_LINK_MUTATION, {
+      
+    variables: {
+      description: formState.description,
+      url: formState.url
+    },
+    onCompleted: () => navigate('/')
   });
+  // ...
 
   return (
     <div>
       <form
         onSubmit={(e) => {
           e.preventDefault();
+          createLink();
         }}
       >
         <div className="flex flex-column mt3">
@@ -44,5 +72,4 @@ const CreateLink = () => {
     </div>
   );
 };
-
 export default CreateLink;
